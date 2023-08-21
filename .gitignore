@@ -163,4 +163,5 @@ cython_debug/
 skins
 faces
 valid_faces
+sample_faces
 .vscode
