@@ -1,42 +1,50 @@
-import torch
+import torch.nn.functional as F
 import torch.nn as nn
+from settings import DEVICE
 
 
-class FaceValidateV1(nn.Module):
+class FaceValidateV1_1(nn.Module):
     def __init__(self):
-        super(FaceValidateV1, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=2, padding=0)
-        self.conv2 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=0)
-        self.conv3 = nn.Conv2d(in_channels=32, out_channels=16, kernel_size=4, padding=0)
-        
-        self.dropout1 = nn.Dropout2d(p=0.4)
-        self.dropout2 = nn.Dropout2d(p=0.2)
-        self.dropout3 = nn.Dropout2d(p=0.1)
-        
+        super(FaceValidateV1_1, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=8, kernel_size=1)
+        self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=2)
+        self.conv3 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=4)
+        self.conv4 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4)
+
+        self.batchnorm1 = nn.BatchNorm2d(16)
+        self.batchnorm2 = nn.BatchNorm2d(32)
+        self.batchnorm3 = nn.BatchNorm2d(64)
+
         self.flatten = nn.Flatten()
-        
-        self.tanh1 = nn.Linear(in_features=8*8, out_features=64)
-        self.tanh2 = nn.Linear(in_features=64, out_features=16)
-        self.tanh3 = nn.Linear(in_features=16, out_features=1)
+
+        self.linear1 = nn.Linear(in_features=64, out_features=32)
+        self.linear2 = nn.Linear(in_features=32, out_features=16)
+        self.linear3 = nn.Linear(in_features=16, out_features=8)
+        self.linear4 = nn.Linear(in_features=8, out_features=1)
 
         self.sigmoid = nn.Sigmoid()
 
+        self.to(DEVICE)
+
     def forward(self, x):
-        x = torch.relu(self.conv1(x))
-        x = self.dropout1(x)
+        x = F.relu(self.conv1(x))
 
-        x = torch.relu(self.conv2(x))
-        x = self.dropout2(x)
-
-        x = torch.relu(self.conv3(x))
-        x = self.dropout3(x)
-
+        x = F.relu(self.conv2(x))
+        x = self.batchnorm1(x)
+        
+        x = F.relu(self.conv3(x))
+        x = self.batchnorm2(x)
+        
+        x = F.relu(self.conv4(x))
+        x = self.batchnorm3(x)
+        
         x = self.flatten(x)
-
-        x = torch.tanh(self.tanh1(x))
-        x = torch.tanh(self.tanh2(x))
-        x = torch.tanh(self.tanh3(x))
+        
+        x = F.tanh(self.linear1(x))
+        x = F.tanh(self.linear2(x))
+        x = F.tanh(self.linear3(x))
+        x = F.tanh(self.linear4(x))
 
         x = self.sigmoid(x)
-        
+
         return x
