@@ -19,7 +19,7 @@ class ValidationModel(nn.Module):
             nn.BatchNorm2d(32)
         )
 
-        self.conv3 = nn.Sequential(
+        self.conv3 = nn.Sequential( 
             nn.Conv2d(32, 64, 4),
             nn.Tanh(),
             nn.BatchNorm2d(64)

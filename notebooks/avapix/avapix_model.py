@@ -48,16 +48,8 @@ class AvapixModel(nn.Module):
         device = x.device
         self.to(device)
 
-        # length = x[:, 2, 0, 0]
-        # seed = x[:, 2, 7, 0]
-        # version = x[:, 0, 7, 7]
-
         x = self.encoder(x)
         x = self.decoder(x)
         x = self.output(x)
-
-        # x[:, 2, 0, 0] = length
-        # x[:, 2, 7, 0] = seed
-        # x[:, 0, 7, 7] = version
 
         return x

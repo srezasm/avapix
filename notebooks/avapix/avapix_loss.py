@@ -15,6 +15,6 @@ class AvapixLoss(nn.Module):
 
         one_tensor = torch.tensor([1.0], device=device)
         loss = torch.tan(one_tensor) / x - torch.tan(x)
-        loss = loss.mean()
+        loss = loss.pow(2).mean()
 
         return loss.requires_grad_(True)
