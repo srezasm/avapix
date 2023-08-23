@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import ndarray
 from torch import Tensor
-from ..settings import *
+from settings import *
 import math
 
 DEFAULT_PIXEL_ORDER = [173, 186, 83, 84, 146, 165, 101, 114, 50, 69,

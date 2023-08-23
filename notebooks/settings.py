@@ -12,11 +12,3 @@ VALIDATION_MODEL_PATH = './assets/validation_model.pth'
 FACE_DIR = '../faces'
 SAMPLE_FACE_DIR = '../sample_faces'
 VALID_FACE_DIR = '../valid_faces'
-
-DEVICE = (
-    'cuda'
-    if torch.cuda.is_available()
-    else 'mps'
-    if torch.backends.mps.is_available()
-    else 'cpu'
-)
