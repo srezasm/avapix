@@ -42,7 +42,7 @@ def gen_pixel_order_v1(random_seed: int):
 
     index_order = []
 
-    # for each color channel (RGB: 0 for Red, 1 for Green, 2 for Blue)
+    # for each color channel (RGB: 0=Red, 1=Green, 2=Blue)
     for left, right in zip([2, 0, 1], [0, 1, 2]):
         for pixel in shuffled_left_pixels:
             if pixel == 0:

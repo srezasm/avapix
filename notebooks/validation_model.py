@@ -4,7 +4,7 @@ import torch.functional as F
 
 
 class ValidationModel(nn.Module):
-    def __init__(self, device) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
         self.conv1 = nn.Sequential(
@@ -32,9 +32,10 @@ class ValidationModel(nn.Module):
             nn.Sigmoid()
         )
 
+    def forward(self, x):
+        device = x.device
         self.to(device)
 
-    def forward(self, x):
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
