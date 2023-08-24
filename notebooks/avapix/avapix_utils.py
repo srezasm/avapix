@@ -114,6 +114,31 @@ def generate_input_v1(img: Tensor, random_seed: int,
 
     return result_img
 
+def extract_text(tensor_img: torch.Tensor):
+    img = tensor_img.clone()
+
+    img = img.squeeze()
+
+    if img.ndim == 3:
+        img = img.permute((1, 2, 0))
+        img = img.reshape(-1)
+    if img.max() <= 1.0:
+        img *= 255
+        img = img.to(torch.uint8)
+
+    version_num = img[VERSION_NUM_INDEX]
+    if version_num == V1_NUMBER:
+        text_length = img[TEXT_LENGTH_INDEX].item()
+        random_seed = img[RANDOM_SEED_INDEX].item()
+        index_order = gen_pixel_order_v1(random_seed)
+
+    text = ''
+
+    for i in range(text_length):
+        text += chr(img[index_order[i]].item())
+
+    return text
+
 
 def img_tensor_to_numpy(tensor: torch.Tensor):
     return tensor.detach().cpu().numpy().squeeze().transpose((1, 2, 0))
