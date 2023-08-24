@@ -9,30 +9,30 @@ class ValidationModel(nn.Module):
 
         self.conv1_encode = nn.Sequential(
             nn.Conv2d(3, 6, 1),
-            nn.Tanh(),
+            nn.LeakyReLU(),
 
             nn.Conv2d(6, 8, 2),
-            nn.Tanh(),
+            nn.LeakyReLU(),
 
             nn.Conv2d(8, 16, 4),
-            nn.Tanh()
+            nn.LeakyReLU()
         )
 
         self.conv2_decode = nn.Sequential(
             nn.ConvTranspose2d(16, 8, 4),
-            nn.Tanh(),
+            nn.ReLU(),
 
             nn.ConvTranspose2d(8, 6, 2),
-            nn.Tanh(),
+            nn.ReLU(),
 
             nn.ConvTranspose2d(6, 3, 1),
-            nn.Tanh()
+            nn.ReLU()
         )
 
         self.conv3_sym = nn.Sequential(
             nn.Conv2d(3, 32, (8, 4)),
+            nn.ReLU(),
             nn.Tanh(),
-            nn.Sigmoid(),
         )
 
         self.flatten = nn.Flatten()
