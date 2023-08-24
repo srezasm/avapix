@@ -8,6 +8,7 @@ DEFAULT_RANDOM_SEED = 42
 V1_NUMBER = 100
 
 VALIDATION_MODEL_PATH = './assets/validation_model.pth'
+AVAPIX_MODEL_PATH = './assets/avapix_model.pth'
 
 FACE_DIR = '../faces'
 SAMPLE_FACE_DIR = '../sample_faces'
