@@ -2,6 +2,7 @@ import numpy as np
 from numpy import ndarray
 from torch import Tensor
 from settings import *
+import matplotlib.pyplot as plt
 import math
 
 DEFAULT_PIXEL_ORDER = [173, 186, 83, 84, 146, 165, 101, 114, 50, 69,
@@ -28,7 +29,7 @@ DEFAULT_PIXEL_ORDER = [173, 186, 83, 84, 146, 165, 101, 114, 50, 69,
 def gen_pixel_order_v1(random_seed: int):
     if random_seed == DEFAULT_RANDOM_SEED:
         return DEFAULT_PIXEL_ORDER
-    
+
     np.random.seed(random_seed)
 
     left_pixels = (
@@ -112,3 +113,14 @@ def generate_input_v1(img: Tensor, random_seed: int,
     result_img[excess_indexes] = 0
 
     return result_img
+
+
+def img_tensor_to_numpy(tensor: torch.Tensor):
+    return tensor.detach().cpu().numpy().squeeze().transpose((1, 2, 0))
+
+
+def show_model_output_image(tensor: torch.Tensor, title: str = ''):
+    plt.imshow(img_tensor_to_numpy(tensor))
+    plt.title(title)
+    plt.axis('off')
+    plt.show()

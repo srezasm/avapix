@@ -7,28 +7,38 @@ class ValidationModel(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(3, 16, 2, padding=1),
+        self.conv1_encode = nn.Sequential(
+            nn.Conv2d(3, 6, 1),
             nn.Tanh(),
-            nn.BatchNorm2d(16)
+
+            nn.Conv2d(6, 8, 2),
+            nn.Tanh(),
+
+            nn.Conv2d(8, 16, 4),
+            nn.Tanh()
         )
 
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(16, 32, 3),
+        self.conv2_decode = nn.Sequential(
+            nn.ConvTranspose2d(16, 8, 4),
             nn.Tanh(),
-            nn.BatchNorm2d(32)
+
+            nn.ConvTranspose2d(8, 6, 2),
+            nn.Tanh(),
+
+            nn.ConvTranspose2d(6, 3, 1),
+            nn.Tanh()
         )
 
-        self.conv3 = nn.Sequential( 
-            nn.Conv2d(32, 64, 4),
+        self.conv3_sym = nn.Sequential(
+            nn.Conv2d(3, 32, (8, 4)),
             nn.Tanh(),
-            nn.BatchNorm2d(64)
+            nn.Sigmoid(),
         )
 
         self.flatten = nn.Flatten()
 
         self.sigmoid = nn.Sequential(
-            nn.Linear(in_features=1024, out_features=1),
+            nn.Linear(in_features=160, out_features=1),
             nn.Sigmoid()
         )
 
@@ -36,9 +46,9 @@ class ValidationModel(nn.Module):
         device = x.device
         self.to(device)
 
-        x = self.conv1(x)
-        x = self.conv2(x)
-        x = self.conv3(x)
+        x = self.conv1_encode(x)
+        x = self.conv2_decode(x)
+        x = self.conv3_sym(x)
 
         x = self.flatten(x)
 
