@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvaPix</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+    <header>
+        <h1>AvaPix</h1>
+        <p>Your
+            <b>unique avatar</b>
+            with your custom
+            <b>embedded text</b>
+            !
+        </p>
+
+        <div class="double-btn">
+            <button class="mc-button" id="embedButton">Embed New</button>
+            <button class="mc-button" id="decodeButton">Decode</button>
+        </div>
+    </header>
+
+    <div class="embed-container" hidden>
+        <h2>Create new avatar</h2>
+        <div class="input-group">
+            <input class="input-text" type="text">
+            <button class="mc-button submit-btn">Submit</button>
+        </div>
+        <img id="result-avatar">
+    </div>
+
+    <div class="decode-container" hidden>
+        <h2>Decode avatar</h2>
+        <div class="input-group">
+            <input type="file">
+            <button class="mc-button">Submit</button>
+        </div>
+        <img id="input-avatar">
+        <input type="text" disabled>
+    </div>
+
+    <script>
+        const embedButton = document.getElementById("embedButton");
+        const decodeButton = document.getElementById("decodeButton");
+        const embedContainer = document.querySelector(".embed-container");
+        const decodeContainer = document.querySelector(".decode-container");
+
+        embedButton.addEventListener("click", () => {
+            embedContainer.hidden = false;
+            decodeContainer.hidden = true;
+        });
+
+        decodeButton.addEventListener("click", () => {
+            embedContainer.hidden = true;
+            decodeContainer.hidden = false;
+        });
+    </script>
+</body>
+
+</html>
