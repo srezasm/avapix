@@ -10,53 +10,66 @@
 
 <body>
     <header>
+        <div class="steve"><span></span></div>
+
         <h1>AvaPix</h1>
-        <p>Your
+
+        <p>
+            Your
             <b>unique avatar</b>
-            with your custom
+            with your
             <b>embedded text</b>
             !
         </p>
 
-        <div class="double-btn">
-            <button class="mc-button" id="embedButton">Embed New</button>
-            <button class="mc-button" id="decodeButton">Decode</button>
-        </div>
+        <button class="mc-button" id="change-layout-button">Decode Existing</button>
     </header>
 
-    <div class="embed-container" hidden>
+    <div class="embed-container container">
         <h2>Create new avatar</h2>
         <div class="input-group">
-            <input class="input-text" type="text">
+            <input class="input-text" type="text" placeholder="Embedding text">
             <button class="mc-button submit-btn">Submit</button>
         </div>
         <img id="result-avatar">
     </div>
 
-    <div class="decode-container" hidden>
+    <div class="decode-container container" hidden>
         <h2>Decode avatar</h2>
-        <div class="input-group">
-            <input type="file">
-            <button class="mc-button">Submit</button>
-        </div>
+        <input type="file" id="file">
+        <label class="mc-button" for="file">Upload File</label>
+
         <img id="input-avatar">
-        <input type="text" disabled>
+        <div class="input-group">
+            <input type="text" placeholder="No decoded text yet '_'" id="decoded-text" disabled>
+            <button id="copy-button" class="mc-button">Copy</button>
+        </div>
     </div>
 
     <script>
-        const embedButton = document.getElementById("embedButton");
-        const decodeButton = document.getElementById("decodeButton");
+        const changeContainerButton = document.getElementById("change-layout-button");
         const embedContainer = document.querySelector(".embed-container");
         const decodeContainer = document.querySelector(".decode-container");
 
-        embedButton.addEventListener("click", () => {
-            embedContainer.hidden = false;
-            decodeContainer.hidden = true;
+        changeContainerButton.addEventListener("click", () => {
+            embedContainer.hidden = !embedContainer.hidden;
+            decodeContainer.hidden = !decodeContainer.hidden;
+
+            if (changeContainerButton.innerText === "Decode Existing") {
+                changeContainerButton.innerText = "Embed New";
+            } else {
+                changeContainerButton.innerText = "Decode Existing";
+            }
         });
 
-        decodeButton.addEventListener("click", () => {
-            embedContainer.hidden = true;
-            decodeContainer.hidden = false;
+        const copyButton = document.getElementById("copy-button");
+        copyButton.addEventListener("click", () => {
+            var copyText = document.getElementById("decoded-text");
+
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(copyText.value);
         });
     </script>
 </body>
