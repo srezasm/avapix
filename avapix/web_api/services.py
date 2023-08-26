@@ -1,6 +1,6 @@
 import torch
-from model import AvaPixModel
-from settings import *
+from avapix.common.models.avapix_model import AvapixModel
+from avapix.common.constants import *
 import utils
 import random
 import os
