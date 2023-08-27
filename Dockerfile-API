@@ -1,14 +1,18 @@
-FROM python:3.10.12-slim-bullseye
+FROM python:3.10.12-slim-bookworm
 
-WORKDIR /api-docker
+WORKDIR /app
 
-COPY ./avapix/common ./avapix
-COPY ./avapix/web_api ./avapix
-COPY ./setup.py .
-COPY ./requirements.txt .
+RUN mkdir -p avapix/web_api
+
+COPY ./requirements.txt /app
+COPY ./avapix/web_api/requirements.txt /app/avapix/web_api/requirements.txt
 
 RUN pip3 install --upgrade pip
-RUN pip3 install -r ./requirements.txt
-RUN pip3 install -r ./avapix/web_api/requirements.txt
+RUN pip3 install -r /app/requirements.txt
+RUN pip3 install -r /app/avapix/web_api/requirements.txt
 
-CMD [ "python3", "-m" , "flask", "--app", "./avapix/web_api/app.py", "run", "--host=0.0.0.0"]
+COPY ./avapix/common /app/avapix
+COPY ./avapix/web_api /app/avapix
+COPY ./setup.py .
+
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--app", "avapix.web_api.app"]
