@@ -18,4 +18,4 @@ def get_full_path(relative_path: str) -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), relative_path))
 
 
-AVATAR_DIR = get_full_path("avatars")
+AVATAR_DIR = get_full_path("static")
