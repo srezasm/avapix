@@ -15,4 +15,4 @@ COPY ./avapix/common /app/avapix
 COPY ./avapix/web_api /app/avapix
 COPY ./setup.py .
 
-CMD [ "python3", "./avapix/web_api/app.py"]
+CMD [ "python3", "avapix/web_api/app.py"]
