@@ -8,11 +8,11 @@ COPY ./requirements.txt /app
 COPY ./avapix/web_api/requirements.txt /app/avapix/web_api/requirements.txt
 
 RUN pip3 install --upgrade pip
-RUN pip3 install -r /app/requirements.txt
 RUN pip3 install -r /app/avapix/web_api/requirements.txt
+RUN pip3 install -r /app/requirements.txt
 
 COPY ./avapix/common /app/avapix
 COPY ./avapix/web_api /app/avapix
 COPY ./setup.py .
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--app", "avapix.web_api.app"]
+CMD [ "python3", "./avapix/web_api/app.py"]
