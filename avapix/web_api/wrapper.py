@@ -19,9 +19,9 @@ strategy.set_strategy(StrategyV1())
 
 class EmbedWrapper:
     def __init__(self) -> None:
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.model = AvapixModel()
-        self.model.load_state_dict(torch.load(MODEL_PATH))
+        self.model.load_state_dict(torch.load(MODEL_PATH, map_location=self.device))
         self.model.eval()
 
     def embed(self, text) -> str:
@@ -76,7 +76,7 @@ class EmbedWrapper:
 
 
 class DecodeWrapper:
-    def decode(self, img_stream: IO[bytes]) -> str:
+    def extract(self, img_stream: IO[bytes]) -> str:
         numpy_img = self.__to_original__(img_stream)
         decoded_text = strategy.extract(numpy_img)
         return decoded_text

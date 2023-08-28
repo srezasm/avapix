@@ -25,15 +25,15 @@ def embed():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/decode", methods=["POST"])
-def decode():
+@app.route("/extract", methods=["POST"])
+def extract():
     try:
         image_file = request.files.get("image").stream
 
         if not image_file:
             return jsonify({"error": "Image file not provided"}), 400
 
-        decoded_text = decode_wrapper.decode(image_file)
+        decoded_text = decode_wrapper.extract(image_file)
 
         return jsonify({"decoded_text": decoded_text}), 200
 
@@ -42,4 +42,4 @@ def decode():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=80, host='0.0.0.0')
+    app.run(debug=False, port=5080, host='0.0.0.0')

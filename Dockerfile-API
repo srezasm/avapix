@@ -7,12 +7,15 @@ RUN mkdir -p avapix/web_api
 COPY ./requirements.txt /app
 COPY ./avapix/web_api/requirements.txt /app/avapix/web_api/requirements.txt
 
+COPY ./setup.py /app/setup.py
+RUN pip3 install -e .
+
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /app/avapix/web_api/requirements.txt
 RUN pip3 install -r /app/requirements.txt
 
-COPY ./avapix/common /app/avapix
-COPY ./avapix/web_api /app/avapix
-COPY ./setup.py .
+
+COPY ./avapix/common /app/avapix/common
+COPY ./avapix/web_api /app/avapix/web_api
 
 CMD [ "python3", "avapix/web_api/app.py"]
