@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import numpy as np
 
 from avapix.web_api.wrapper import EmbedWrapper, DecodeWrapper
 
@@ -42,4 +41,4 @@ def extract():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=5080, host='0.0.0.0')
+    app.run(debug=False, port=80, host='0.0.0.0')

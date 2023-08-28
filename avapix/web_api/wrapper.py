@@ -9,13 +9,10 @@ from time import time
 
 from avapix.common.models.avapix_model import AvapixModel
 from avapix.common.constants import *
-from avapix.common.strategy_context import StrategyContext
-from avapix.common.versioned_strategies.strategy_v1 import StrategyV1
+from avapix.common.processor import Processor
 from avapix.web_api.api_constants import *
 
-strategy = StrategyContext()
-strategy.set_strategy(StrategyV1())
-
+processor = Processor()
 
 class EmbedWrapper:
     def __init__(self) -> None:
@@ -24,8 +21,11 @@ class EmbedWrapper:
         self.model.load_state_dict(torch.load(MODEL_PATH, map_location=self.device))
         self.model.eval()
 
+    # TODO: optionally get random seed from user
+    # TODO: optionally get version from user
     def embed(self, text) -> str:
-        raw_embed = strategy.embed(text)
+        random_seed = np.random.randint(0, 256)
+        raw_embed = processor.embed(text, random_seed)
         generated_img = self.__gen__(raw_embed)
         file_name = self.__save__(generated_img, text)
 
@@ -78,7 +78,7 @@ class EmbedWrapper:
 class DecodeWrapper:
     def extract(self, img_stream: IO[bytes]) -> str:
         numpy_img = self.__to_original__(img_stream)
-        decoded_text = strategy.extract(numpy_img)
+        decoded_text = processor.extract(numpy_img)
         return decoded_text
 
     def __to_original__(self, img_stream: IO[bytes]) -> ndarray:

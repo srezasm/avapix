@@ -1,4 +1,4 @@
-from avapix.common.versioned_strategies.base_strategy import BaseStrategy
+from avapix.common.processors.base_processor import BaseProcessor
 from avapix.common.constants import *
 
 from numpy import ndarray
@@ -6,55 +6,43 @@ import numpy as np
 import math
 
 
-class StrategyV1(BaseStrategy):
+class ProcessorV1_1(BaseProcessor):
     def __init__(self) -> None:
         super().__init__()
 
-        self.version_num = 100
+        self.version_num = 110
         self.max_text_len = 188
 
     def get_version_num(self) -> int:
         return self.version_num
 
     def __gen_pixel_order__(self, random_seed: int) -> ndarray:
-        np.random.seed(random_seed)
+        '''
+        Non-symmetric color channel index generator
 
-        left_pixels = np.arange(0, 64).reshape(8, 8)[:, :4].reshape(-1)
+        Parameters
+        ----------
+        random_seed : int
+            Random seed to enable reproducibility
+        '''
 
-        # shuffle left pixels
-        shuffled_left_pixels = np.random.permutation(left_pixels)
+        rng = np.random.default_rng(random_seed)
+
+        img_idxs = np.arange(192).reshape((64, 3))
+        rng.shuffle(img_idxs)
 
         index_order = []
 
-        # for each color channel (RGB: 0=Red, 1=Green, 2=Blue)
-        for left, right in zip([2, 0, 1], [0, 1, 2]):
-            for pixel in shuffled_left_pixels:
-                if pixel == 0:
-                    row = 1
-                elif pixel % 8 == 0:
-                    row = pixel // 8 + 1
-                else:
-                    row = math.ceil(pixel / 8)
-
-                first = (row - 1) * 8
-                last = row * 8 - 1
-                position = pixel - first
-                mirror = last - position
-
-                index_order.extend([pixel * 3 + left, mirror * 3 + right])
-
-        # remove the indices for metadata channels
-        metadata_indices = [
-            self.TEXT_LENGTH_INDEX,
-            self.RANDOM_SEED_INDEX,
-            self.VERSION_NUM_INDEX,
-        ]
-        index_order = [index for index in index_order if index not in metadata_indices]
+        rand_idxs = rng.integers(0, 3, 64)
+        for _ in range(3):
+            rand_idxs = (rand_idxs + 1) % 3
+            index_order.extend(
+                img_idxs[range(len(img_idxs)), rand_idxs])
 
         return index_order
 
     def embed(self, text, random_seed: int = 42) -> ndarray:
-        """
+        '''
         Embeds text into a raw RGB image array.
 
         Parameters
@@ -68,7 +56,7 @@ class StrategyV1(BaseStrategy):
         -------
         ndarray
             Standard RGB image array with shape (8, 8, 3).
-        """
+        '''
 
         text_length = len(text)
 
@@ -93,7 +81,7 @@ class StrategyV1(BaseStrategy):
         return img.reshape((8, 8, 3))
 
     def extract(self, image_array: ndarray) -> str:
-        """
+        '''
         Extracts text from an image array.
 
         Parameters
@@ -105,7 +93,7 @@ class StrategyV1(BaseStrategy):
         -------
         str
             Extracted text from the image.
-        """
+        '''
 
         img = image_array.squeeze()
 
