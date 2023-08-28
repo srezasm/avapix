@@ -135,12 +135,6 @@ header {
     box-shadow: inset -2px -4px #0004, inset 2px 2px #fff5;
 }
 
-.avatar-img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 15px;
-}
-
 .double-btn {
     display: flex;
     justify-content: space-between;
@@ -175,4 +169,17 @@ header {
     height: 0;
     visibility: hidden;
     position: absolute;
+}
+
+.avatar-img {
+    /* make alt text centered */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* draw borders */
+    border: 2px solid #999;
+
+    font-size: 10pt;
 }
