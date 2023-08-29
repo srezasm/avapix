@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify
+import os
 
-from avapix.web_api.wrapper import EmbedWrapper, DecodeWrapper
+from avapix.web_api.api_helper import Helper
 
 app = Flask(__name__)
 
-embed_wrapper = EmbedWrapper()
-decode_wrapper = DecodeWrapper()
+helper = Helper()
+
 
 @app.route("/embed", methods=["POST"])
 def embed():
@@ -16,8 +17,10 @@ def embed():
         if not text:
             return jsonify({"error": "Text not provided"}), 400
 
-        image_file_name = embed_wrapper.embed(text)
-        
+        # TODO: optionally get random seed from user
+        # TODO: optionally get version from user
+        image_file_name = helper.embed(text)
+
         return jsonify({"image_url": f"/static/{image_file_name}"}), 200
 
     except Exception as e:
@@ -32,7 +35,7 @@ def extract():
         if not image_file:
             return jsonify({"error": "Image file not provided"}), 400
 
-        decoded_text = decode_wrapper.extract(image_file)
+        decoded_text = helper.extract(image_file)
 
         return jsonify({"decoded_text": decoded_text}), 200
 
@@ -41,4 +44,4 @@ def extract():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=80, host='0.0.0.0')
+    app.run(debug=False, port=5080, host="0.0.0.0")

@@ -1,5 +1,4 @@
 from avapix.common.processors.base_processor import BaseProcessor
-from avapix.common.constants import *
 
 from numpy import ndarray
 import numpy as np
@@ -16,17 +15,15 @@ class ProcessorV1_0(BaseProcessor):
     def get_version_num(self) -> int:
         return self.version_num
 
-    def __gen_pixel_order__(self, random_seed: int = None) -> ndarray:
-        '''
+    def __gen_pixel_order__(self, random_seed: int) -> ndarray:
+        """
         Symmetric color channel index generator
 
         Parameters
         ----------
         random_seed : int
             Random seed to enable reproducibility
-        '''
-        if random_seed is None:
-            random_seed = np.random.randint(0, 256)
+        """
 
         rng = np.random.default_rng(random_seed)
 
@@ -65,7 +62,7 @@ class ProcessorV1_0(BaseProcessor):
         return index_order
 
     def embed(self, text, random_seed: int = None) -> ndarray:
-        '''
+        """
         Embeds text into a raw RGB image array.
 
         Parameters
@@ -80,7 +77,10 @@ class ProcessorV1_0(BaseProcessor):
         -------
         ndarray
             Standard RGB image array with shape (8, 8, 3).
-        '''
+        """
+
+        if random_seed is None:
+            random_seed = np.random.randint(0, 256)
 
         text_length = len(text)
 
@@ -105,7 +105,7 @@ class ProcessorV1_0(BaseProcessor):
         return img.reshape((8, 8, 3))
 
     def extract(self, image_array: ndarray) -> str:
-        '''
+        """
         Extracts text from an image array.
 
         Parameters
@@ -117,7 +117,7 @@ class ProcessorV1_0(BaseProcessor):
         -------
         str
             Extracted text from the image.
-        '''
+        """
 
         img_flat = image_array.reshape(-1)
 
