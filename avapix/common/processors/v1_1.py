@@ -16,7 +16,7 @@ class ProcessorV1_1(BaseProcessor):
     def get_version_num(self) -> int:
         return self.version_num
 
-    def __gen_pixel_order__(self, random_seed: int) -> ndarray:
+    def __gen_pixel_order__(self, random_seed: int = None) -> ndarray:
         '''
         Non-symmetric color channel index generator
 
@@ -25,6 +25,9 @@ class ProcessorV1_1(BaseProcessor):
         random_seed : int
             Random seed to enable reproducibility
         '''
+
+        if random_seed is None:
+            random_seed = np.random.randint(0, 256)
 
         rng = np.random.default_rng(random_seed)
 
@@ -41,7 +44,7 @@ class ProcessorV1_1(BaseProcessor):
 
         return index_order
 
-    def embed(self, text, random_seed: int = 42) -> ndarray:
+    def embed(self, text, random_seed: int = None) -> ndarray:
         '''
         Embeds text into a raw RGB image array.
 
@@ -50,7 +53,8 @@ class ProcessorV1_1(BaseProcessor):
         text : str
             Text to embed into the image.
         random_seed : int, optional
-            Random seed to use for generating the embedding order, by default 42
+            Random seed to use for generating the embedding order.
+            If not provided, a random seed will be generated.
 
         Returns
         -------
@@ -95,21 +99,7 @@ class ProcessorV1_1(BaseProcessor):
             Extracted text from the image.
         '''
 
-        img = image_array.squeeze()
-
-        if img.ndim != 3:
-            raise Exception("Image must have 3 dimensions.")
-        if img.shape != (8, 8, 3):
-            raise Exception("Image must be in shape (8, 8, 3)")
-        if img.max() <= 1.0:
-            raise Exception("Image must be in range [0, 255]")
-
-        img_flat = img.reshape(-1)
-
-        version_num = img_flat[self.VERSION_NUM_INDEX]
-
-        if version_num != self.version_num:
-            raise Exception(f"Image version number must be {self.version_num}.")
+        img_flat = image_array.reshape(-1)
 
         text_length = img_flat[self.TEXT_LENGTH_INDEX]
         random_seed = img_flat[self.RANDOM_SEED_INDEX]
