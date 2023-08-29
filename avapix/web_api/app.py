@@ -43,5 +43,27 @@ def extract():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/is-ready", methods=["GET", "POST"])
+def is_ready():
+    try:
+        text = "is ready?"
+
+        file_name = helper.embed(text)
+        assert file_name
+
+        file_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "static/" + file_name)
+        )
+
+        decoded_text = helper.extract(file_path)
+        assert decoded_text == text
+
+        os.remove(file_path)
+
+        return jsonify({"is_ready": True}), 200
+    except:
+        return jsonify({"is_ready": True}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=False, port=5080, host="0.0.0.0")
