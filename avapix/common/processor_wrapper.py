@@ -8,7 +8,6 @@ from hashlib import sha256
 from time import time
 
 from avapix.common.processor import Processor
-from avapix.web_api.api_constants import *
 
 
 class ProcessorWrapper:

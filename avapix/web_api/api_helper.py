@@ -8,7 +8,8 @@ from typing import Any
 import os
 
 from avapix.common.processor_wrapper import ProcessorWrapper
-from avapix.web_api.api_constants import AVATAR_DIR
+
+AVATAR_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "static"))
 
 
 class Helper:
