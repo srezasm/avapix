@@ -99,7 +99,7 @@
                 };
 
                 try {
-                    const response = await fetch("https://cors-anywhere.herokuapp.com/https://avapix.darkube.app/embed", {
+                    const response = await fetch("https://avapix.darkube.app/embed", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -114,7 +114,7 @@
 
                     const responseData = await response.json();
                     const imageUrl = responseData.image_url;
-                    resultAvatar.src = "https://cors-anywhere.herokuapp.com/https://avapix.darkube.app" + imageUrl;
+                    resultAvatar.src = "https://avapix.darkube.app" + imageUrl;
                 } catch (error) {
                     console.error("Error:", error);
                 }

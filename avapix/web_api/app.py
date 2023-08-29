@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 import os
 
 from avapix.web_api.api_helper import Helper
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 helper = Helper()
 
