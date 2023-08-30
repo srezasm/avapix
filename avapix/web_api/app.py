@@ -61,9 +61,9 @@ def is_ready():
 
         os.remove(file_path)
 
-        return jsonify({"is_ready": True}), 200
+        return jsonify(success=True), 200
     except:
-        return jsonify({"is_ready": True}), 500
+        return jsonify(success=False), 500
 
 
 if __name__ == "__main__":
