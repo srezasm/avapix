@@ -71,12 +71,12 @@ def ask_for_random_seed() -> int:
         inquirer.Text(
             "random_seed",
             message="Enter random seed [Enter]",
-            validate=lambda _, x: x.isdigit() or x == "",
+            validate=lambda _, x: (x.isdigit() or x == "") and int(x) >= 0 and int(x) <= 255,
         ),
     ]
     answers = inquirer.prompt(questions)
 
-    return answers["random_seed"]
+    return int(answers["random_seed"])
 
 
 def ask_for_version() -> str:
