@@ -24,7 +24,7 @@
         </p>
 
         <button class="mc-button" id="change-layout-button">
-            Decode Existing
+            Extract text
         </button>
     </header>
 
@@ -34,17 +34,19 @@
             <input class="input-text" type="text" placeholder="Embedding text" />
             <button class="mc-button submit-btn">Create</button>
         </div>
-        <img id="result-avatar" class="avatar-img" width="240px" height="240px" alt="No avatar generated yet!" />
+        <a id="avatar-dl">
+            <img id="result-avatar" class="avatar-img" width="240px" height="240px" alt="No avatar generated yet!" />
+        </a>
     </div>
 
-    <div class="decode-container container" hidden>
-        <h2>Decode avatar</h2>
+    <div class="extract-container container" hidden>
+        <h2>Extract text from avatar</h2>
         <input type="file" id="file" />
         <label class="mc-button" for="file">Upload File</label>
 
         <img id="input-avatar" class="avatar-img" width="240px" height="240px" alt="No avatar selected yet!" />
-        <div class="input-group" hidden>
-            <input type="text" placeholder="No decoded text yet '_'" id="decoded-text" disabled />
+        <div id="extract-result" class="input-group" hidden>
+            <input type="text" id="extracted-text" disabled />
             <button id="copy-button" class="mc-button">Copy</button>
         </div>
     </div>
@@ -56,24 +58,24 @@
             );
             const embedContainer =
                 document.querySelector(".embed-container");
-            const decodeContainer =
-                document.querySelector(".decode-container");
+            const extractContainer =
+                document.querySelector(".extract-container");
 
             changeContainerButton.addEventListener("click", () => {
                 embedContainer.hidden = !embedContainer.hidden;
-                decodeContainer.hidden = !decodeContainer.hidden;
+                extractContainer.hidden = !extractContainer.hidden;
 
-                if (changeContainerButton.innerText === "Decode Existing") {
-                    changeContainerButton.innerText = "Embed New";
+                if (changeContainerButton.innerText === "Extract text") {
+                    changeContainerButton.innerText = "Embed New avatar";
                 } else {
-                    changeContainerButton.innerText = "Decode Existing";
+                    changeContainerButton.innerText = "Extract text";
                 }
             });
 
             // Copy to clipboard button
             const copyButton = document.getElementById("copy-button");
             copyButton.addEventListener("click", () => {
-                var copyText = document.getElementById("decoded-text");
+                var copyText = document.getElementById("extracted-text");
 
                 copyText.select();
                 copyText.setSelectionRange(0, 99999);
@@ -85,6 +87,7 @@
             const submitButton = document.querySelector(".submit-btn");
             const inputText = document.querySelector(".input-text");
             const resultAvatar = document.querySelector("#result-avatar");
+            const avatarDl = document.querySelector("#avatar-dl");
 
             submitButton.addEventListener("click", async () => {
                 const inputValue = inputText.value;
@@ -113,18 +116,19 @@
                     }
 
                     const responseData = await response.json();
-                    const imageUrl = responseData.image_url;
-                    resultAvatar.src = "https://avapix.darkube.app" + imageUrl;
+                    const imageUrl = "https://avapix.darkube.app" + responseData.image_url;
+                    resultAvatar.src = imageUrl;
+                    avatarDl.href = imageUrl;
                 } catch (error) {
                     console.error("Error:", error);
                 }
             });
 
-            // Decode existing avatar
+            // Extract text from avatar
             const fileInput = document.querySelector("#file");
             const inputAvatar = document.querySelector("#input-avatar");
-            const decodedText = document.querySelector("#decoded-text");
-            const inputGroup = document.querySelector(".input-group");
+            const extractedText = document.querySelector("#extracted-text");
+            const resultInputGroup = document.querySelector("#extract-result");
 
             fileInput.addEventListener("change", async () => {
                 const selectedFile = fileInput.files[0];
@@ -144,9 +148,9 @@
                     });
 
                     if (response.ok) {
-                        const resultText = await response.text();
-                        inputGroup.hidden = false;
-                        decodedText.value = resultText;
+                        const resultText = await response.json();
+                        resultInputGroup.hidden = false;
+                        extractedText.value = resultText.text;
                     } else {
                         console.error("Decoding failed");
                     }

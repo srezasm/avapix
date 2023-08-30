@@ -38,7 +38,7 @@ def extract():
 
         decoded_text = helper.extract(image_file)
 
-        return jsonify({"decoded_text": decoded_text}), 200
+        return jsonify({"text": decoded_text}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
