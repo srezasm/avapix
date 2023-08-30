@@ -7,36 +7,49 @@ from time import time
 from typing import Any
 import os
 
-from avapix.common.processor_wrapper import ProcessorWrapper
+from avapix.common.processor import Processor
+from avapix.common.configs import last_version
 
 AVATAR_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "static"))
 
 
-class Helper:
-    def __init__(self) -> None:
-        self.processor = ProcessorWrapper()
+processor = Processor()
 
-    def embed(self, text: str, random_seed: int = None) -> str:
-        generated_img = self.processor.embed(text, random_seed)
-        file_name = self.save(generated_img, text)
 
-        return file_name
+def embed(text: str, random_seed: int = None, version: str = last_version) -> str:
+    generated_img = processor.embed(text, random_seed, version)
+    file_name = __save(generated_img, text)
 
-    def save(self, image: ndarray, text: str, upscale_factor: int = 30):
-        hash_text = time().hex() + text
-        file_name = f"avatar_{sha256(hash_text.encode()).hexdigest()[:10]}.png"
-        image_path = os.path.join(AVATAR_DIR, file_name)
+    return file_name
 
-        image = self.upscale(image, upscale_factor)
 
-        Image.fromarray(image, "RGB").save(image_path)
+def extract(img_stream: IO[bytes] | Any) -> str:
+    image = Image.open(img_stream)
 
-        return file_name
+    if image.size[0] != image.size[1]:
+        raise ValueError("Invalid image: input image must be square")
 
-    def upscale(self, image: ndarray, factor: int = 30):
-        return np.kron(image, np.ones((factor, factor, 1))).astype(np.uint8)
+    # TODO: return warning for RGBA model
+    if image.mode != "RGB":
+        raise ValueError("Invalid image: input image must be RGB")
+    
+    image = np.array(image)
+    decoded_text = processor.extract(image)
 
-    def extract(self, img_stream: IO[bytes] | Any) -> str:
-        decoded_text = self.processor.extract(img_stream)
+    return decoded_text
 
-        return decoded_text
+
+def __save(image: ndarray, text: str, upscale_factor: int = 30):
+    hash_text = time().hex() + text
+    file_name = f"avatar_{sha256(hash_text.encode()).hexdigest()[:10]}.png"
+    image_path = os.path.join(AVATAR_DIR, file_name)
+
+    image = __upscale(image, upscale_factor)
+
+    Image.fromarray(image, "RGB").save(image_path)
+
+    return file_name
+
+
+def __upscale(image: ndarray, factor: int = 30) -> str:
+    return np.kron(image, np.ones((factor, factor, 1))).astype(np.uint8)

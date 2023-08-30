@@ -1,13 +1,11 @@
 from flask import Flask, request, jsonify
 import os
 
-from avapix.web_api.api_helper import Helper
+import avapix.web_api.api_helper as helper
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-
-helper = Helper()
 
 @app.route("/embed", methods=["POST"])
 def embed():
