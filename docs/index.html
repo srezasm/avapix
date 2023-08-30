@@ -150,7 +150,7 @@
                     if (response.ok) {
                         const resultText = await response.json();
                         resultInputGroup.hidden = false;
-                        extractedText.value = resultText.text;
+                        extractedText.value = resultText.decoded_text;
                     } else {
                         console.error("Decoding failed");
                     }
