@@ -19,11 +19,13 @@ processor = Processor()
 def embed(
     text: str,
     export_sizes: list[int],
-    random_seed: int,
+    random_seed,
     version: str,
 ) -> list[str]:
-    if not random_seed:
+    if random_seed == "":
         random_seed = None
+    else:
+        random_seed = int(random_seed)
 
     generated_img = processor.embed(text, random_seed, version)
 

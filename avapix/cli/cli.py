@@ -67,11 +67,17 @@ def ask_for_embedding_text() -> str:
 
 
 def ask_for_random_seed() -> int:
+    def validator(_, x):
+        if x.isdigit():
+            return int(x) >= 0 and int(x) <= 255
+        else:
+            return x == ""
+        
     questions = [
         inquirer.Text(
             "random_seed",
             message="Enter random seed [Enter]",
-            validate=lambda _, x: x.isdigit() or x == "",
+            validate=validator,
         ),
     ]
     answers = inquirer.prompt(questions)
