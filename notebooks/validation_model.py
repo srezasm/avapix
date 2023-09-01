@@ -8,45 +8,60 @@ class ValidationModel(nn.Module):
         super().__init__()
 
         # cnn
-        self.conv1 = nn.Conv2d(3, 8, 2)     # 7x7
-        self.conv2 = nn.Conv2d(8, 16, 3)    # 4x4
-        self.mp = nn.MaxPool2d(2, 2)        # 2x2
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, 8, 2),  # 7x7
+            nn.ReLU(),
+            nn.BatchNorm2d(8),
+            nn.Conv2d(8, 16, 3),  # 4x4
+            nn.ReLU(),
+            nn.BatchNorm2d(16),
+            nn.MaxPool2d(2, 2),  # 2x2
+            nn.ReLU(),
+            nn.BatchNorm2d(16),
+        )
 
-        self.ln1 = nn.Linear(64, 32)
-        self.bn1 = nn.BatchNorm1d(32)
-        self.ln2 = nn.Linear(32, 8)
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(3, 16, 2, 2),  # 4x4
+            nn.ReLU(),
+            nn.BatchNorm2d(16),
+            nn.MaxPool2d(2, 2),  # 2x2
+            nn.ReLU(),
+            nn.BatchNorm2d(16),
+        )
 
-        # tabular
-        self.ln3 = nn.Linear(3, 8)
-        self.ln4 = nn.BatchNorm1d(8)
+        self.conv3 = nn.Sequential(
+            nn.Conv2d(3, 16, 4, 4), nn.ReLU(), nn.BatchNorm2d(16)  # 2x2
+        )
 
-        # concat
-        self.bn4 = nn.BatchNorm1d(16)
-        self.ln5 = nn.Linear(16, 1)
+        self.ln1 = nn.Sequential(
+            nn.Linear(192, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
+            nn.Tanh(),
+            nn.BatchNorm1d(32),
+            nn.Linear(32, 16),
+            nn.ReLU(),
+            nn.Linear(16, 8),
+            nn.Tanh(),
+            nn.BatchNorm1d(8),
+            nn.Linear(8, 4),
+            nn.ReLU(),
+            nn.Linear(4, 2),
+            nn.Tanh(),
+            nn.BatchNorm1d(2),
+            nn.Linear(2, 1),
+            nn.Sigmoid(),
+        )
 
-    def forward(self, img, tab):
+    def forward(self, img):
         # cnn
-        img = F.relu(self.conv1(img))
-        img = F.relu(self.conv2(img))
-        img = self.mp(img)
+        img1 = self.conv1(img)  # [16, 16, 2, 2]
+        img2 = self.conv2(img)  # [16, 16, 2, 2]
+        img3 = self.conv3(img)  # [16, 16, 2, 2]
 
-        img = img.reshape(img.shape[0], -1)
+        img = torch.concat((img1, img2, img3), dim=1)  # concat
+        img = img.reshape(img.shape[0], -1)  # flatten
 
-        img = F.relu(self.ln1(img))
-        img = self.bn1(img)
-        img = F.tanh(self.ln2(img))
+        img = self.ln1(img)
 
-        # tabular
-        tab = F.relu(self.ln3(tab))
-        tab = F.tanh(tab)
-
-        #   for training [more than 1 input]
-        if tab.ndim > 2:
-            tab = tab.squeeze()
-
-        # concat
-        result = torch.cat((img, tab), dim=1)
-        result = self.bn4(result)
-        result = F.sigmoid(self.ln5(result))
-
-        return result
+        return img
