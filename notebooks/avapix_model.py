@@ -7,57 +7,63 @@ class AvapixModel(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
-        self.encoder = nn.Sequential(
-            nn.Conv2d(3, 8, 2),
+        self.encode1 = nn.Sequential(
+            nn.Conv2d(3, 8, 2),  # 7x7
             nn.ReLU(),
-            nn.BatchNorm2d(8),
-            nn.Conv2d(8, 16, 2),
+            nn.Conv2d(8, 16, 3),  # 4x4
             nn.ReLU(),
+            nn.MaxPool2d(2, 2),  # 2x2
+            nn.Tanh(),
             nn.BatchNorm2d(16),
-            nn.Conv2d(16, 32, 2),
+        )
+
+        self.encode2 = nn.Sequential(
+            nn.Conv2d(3, 16, 2, 2),  # 4x4
             nn.ReLU(),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(32, 64, 2),
+            nn.MaxPool2d(2, 2),  # 2x2
+            nn.Tanh(),
+            nn.BatchNorm2d(16),
+        )
+
+        self.encode3 = nn.Sequential(
+            nn.Conv2d(3, 16, 4, 4),
+            nn.Tanh(),
+            nn.BatchNorm2d(16)  # 2x2
+        )
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(48, 64, 1),
             nn.ReLU(),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(64, 128, 2),
+
+            nn.Conv2d(64, 128, 1),
+            nn.Tanh(),
+
+            nn.Conv2d(128, 256, 1),
             nn.ReLU(),
-            nn.BatchNorm2d(128),
-            nn.Conv2d(128, 256, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(256),
-            nn.Conv2d(256, 512, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(512),
+            nn.BatchNorm2d(256)
         )
 
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(512, 256, 2),
+            nn.ConvTranspose2d(256, 64, 1),
             nn.ReLU(),
-            nn.BatchNorm2d(256),
-            nn.ConvTranspose2d(256, 128, 2),
+            nn.ConvTranspose2d(64, 16, 2),
+            nn.Tanh(),
+            nn.ConvTranspose2d(16, 8, 3),
             nn.ReLU(),
-            nn.BatchNorm2d(128),
-            nn.ConvTranspose2d(128, 64, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(64),
-            nn.ConvTranspose2d(64, 32, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(32),
-            nn.ConvTranspose2d(32, 16, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(16),
-            nn.ConvTranspose2d(16, 8, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(8),
-            nn.ConvTranspose2d(8, 3, 2),
-            nn.ReLU(),
-            nn.BatchNorm2d(3),
-            nn.Sigmoid()
+            nn.ConvTranspose2d(8, 3, 4),
+            nn.Tanh(),
+            nn.BatchNorm2d(3)
         )
 
-    def forward(self, x):
-        x = self.encoder(x)
-        x = self.decoder(x)
+    def forward(self, img):
+        img1 = self.encode1(img)
+        img2 = self.encode2(img)
+        img3 = self.encode3(img)
 
-        return x
+        img = torch.concat((img1, img2, img3), dim=1)
+
+        img = self.conv(img)
+
+        img = self.decoder(img)
+
+        return img
