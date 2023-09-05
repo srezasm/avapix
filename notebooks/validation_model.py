@@ -7,61 +7,89 @@ class ValidationModel(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
-        # cnn
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(3, 8, 2),  # 7x7
-            nn.ReLU(),
-            nn.BatchNorm2d(8),
-            nn.Conv2d(8, 16, 3),  # 4x4
-            nn.ReLU(),
-            nn.BatchNorm2d(16),
-            nn.MaxPool2d(2, 2),  # 2x2
-            nn.ReLU(),
-            nn.BatchNorm2d(16),
-        )
+        # CNN
+        self.conv1 = nn.Conv2d(3, 16, (4, 8))
+        self.mp1 = nn.MaxPool2d((2, 1))
 
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(3, 16, 2, 2),  # 4x4
-            nn.ReLU(),
-            nn.BatchNorm2d(16),
-            nn.MaxPool2d(2, 2),  # 2x2
-            nn.ReLU(),
-            nn.BatchNorm2d(16),
-        )
+        self.conv2 = nn.Conv2d(3, 16, (8, 4))
+        self.mp2 = nn.MaxPool2d((1, 2))
 
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(3, 16, 4, 4), nn.ReLU(), nn.BatchNorm2d(16)  # 2x2
-        )
+        self.conv3 = nn.Conv2d(3, 16, 4)
+        self.mp3 = nn.MaxPool2d(2)
 
-        self.ln1 = nn.Sequential(
-            nn.Linear(192, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.Tanh(),
-            nn.BatchNorm1d(32),
-            nn.Linear(32, 16),
-            nn.ReLU(),
-            nn.Linear(16, 8),
-            nn.Tanh(),
-            nn.BatchNorm1d(8),
-            nn.Linear(8, 4),
-            nn.ReLU(),
-            nn.Linear(4, 2),
-            nn.Tanh(),
-            nn.BatchNorm1d(2),
-            nn.Linear(2, 1),
-            nn.Sigmoid(),
-        )
+
+        # Linear
+        self.bn = nn.BatchNorm1d(128)
+
+        self.ln1 = nn.Linear(128, 256)
+        self.do1 = nn.Dropout(0.5)
+
+        self.ln2 = nn.Linear(256, 512)
+        self.do2 = nn.Dropout(0.5)
+
+        self.ln3 = nn.Linear(512, 64)
+        self.do3 = nn.Dropout(0.5)
+        
+        self.ln4 = nn.Linear(64, 32)
+        self.do3 = nn.Dropout(0.5)
+
+        self.ln5 = nn.Linear(32, 1)
+        
+   
+        # Weight initialization
+        #     CNN
+        nn.init.kaiming_normal_(self.conv1.weight, mode='fan_in', nonlinearity="relu")
+        nn.init.constant_(self.conv1.bias, 0)
+        nn.init.kaiming_normal_(self.conv2.weight, mode='fan_in', nonlinearity="relu")
+        nn.init.constant_(self.conv2.bias, 0)
+        nn.init.kaiming_normal_(self.conv3.weight, mode='fan_in', nonlinearity="relu")
+        nn.init.constant_(self.conv3.bias, 0)
+
+        #    Linear
+        nn.init.xavier_normal_(self.ln1.weight)
+        nn.init.constant_(self.ln1.bias, 0)
+        nn.init.xavier_normal_(self.ln2.weight)
+        nn.init.constant_(self.ln2.bias, 0)
+        nn.init.xavier_normal_(self.ln3.weight)
+        nn.init.constant_(self.ln3.bias, 0)
+        nn.init.xavier_normal_(self.ln4.weight)
+        nn.init.constant_(self.ln4.bias, 0)
+        nn.init.xavier_normal_(self.ln5.weight)
+        nn.init.constant_(self.ln5.bias, 0)
 
     def forward(self, img):
-        # cnn
-        img1 = self.conv1(img)  # [16, 16, 2, 2]
-        img2 = self.conv2(img)  # [16, 16, 2, 2]
-        img3 = self.conv3(img)  # [16, 16, 2, 2]
+        # CNN
+        img1 = torch.relu(self.conv1(img))
+        img1 = self.mp1(img1)
+        img1 = img1.reshape(img1.shape[0], -1)
 
-        img = torch.concat((img1, img2, img3), dim=1)  # concat
-        img = img.reshape(img.shape[0], -1)  # flatten
+        img2 = torch.relu(self.conv2(img))
+        img2 = self.mp2(img2)
+        img2 = img2.reshape(img2.shape[0], -1)
 
-        img = self.ln1(img)
+        img3 = self.conv3(img)
+        img3 = self.mp3(img3)
+        img3 = img3.reshape(img3.shape[0], -1)
 
+        # Concatenate
+        img = torch.cat([img1, img2, img3], dim=1)
+
+        # Batch norm
+        img = self.bn(img)
+
+        # Linear
+        img = torch.tanh(self.ln1(img))
+        img = self.do1(img)
+
+        img = torch.tanh(self.ln2(img))
+        img = self.do2(img)
+
+        img = torch.tanh(self.ln3(img))
+        img = self.do3(img)
+
+        img = torch.tanh(self.ln4(img))
+        img = self.do3(img)
+
+        img = torch.sigmoid(self.ln5(img))
+        
         return img
