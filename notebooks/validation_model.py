@@ -23,26 +23,23 @@ class ValidationModel(nn.Module):
 
         self.ln1 = nn.Linear(128, 256)
         self.do1 = nn.Dropout(0.5)
-
-        self.ln2 = nn.Linear(256, 512)
+        
+        self.ln2 = nn.Linear(256, 128)
         self.do2 = nn.Dropout(0.5)
 
-        self.ln3 = nn.Linear(512, 64)
-        self.do3 = nn.Dropout(0.5)
-        
-        self.ln4 = nn.Linear(64, 32)
+        self.ln3 = nn.Linear(128, 64)
         self.do3 = nn.Dropout(0.5)
 
-        self.ln5 = nn.Linear(32, 1)
+        self.ln4 = nn.Linear(64, 1)
         
    
         # Weight initialization
         #     CNN
-        nn.init.kaiming_normal_(self.conv1.weight, mode='fan_in', nonlinearity="relu")
+        nn.init.kaiming_normal_(self.conv1.weight, nonlinearity="relu")
         nn.init.constant_(self.conv1.bias, 0)
-        nn.init.kaiming_normal_(self.conv2.weight, mode='fan_in', nonlinearity="relu")
+        nn.init.kaiming_normal_(self.conv2.weight, nonlinearity="relu")
         nn.init.constant_(self.conv2.bias, 0)
-        nn.init.kaiming_normal_(self.conv3.weight, mode='fan_in', nonlinearity="relu")
+        nn.init.kaiming_normal_(self.conv3.weight, nonlinearity="relu")
         nn.init.constant_(self.conv3.bias, 0)
 
         #    Linear
@@ -54,8 +51,6 @@ class ValidationModel(nn.Module):
         nn.init.constant_(self.ln3.bias, 0)
         nn.init.xavier_normal_(self.ln4.weight)
         nn.init.constant_(self.ln4.bias, 0)
-        nn.init.xavier_normal_(self.ln5.weight)
-        nn.init.constant_(self.ln5.bias, 0)
 
     def forward(self, img):
         # CNN
@@ -81,15 +76,12 @@ class ValidationModel(nn.Module):
         img = torch.tanh(self.ln1(img))
         img = self.do1(img)
 
-        img = torch.tanh(self.ln2(img))
+        img = torch.sigmoid(self.ln2(img))
         img = self.do2(img)
 
         img = torch.tanh(self.ln3(img))
         img = self.do3(img)
 
-        img = torch.tanh(self.ln4(img))
-        img = self.do3(img)
-
-        img = torch.sigmoid(self.ln5(img))
+        img = torch.sigmoid(self.ln4(img))
         
         return img
