@@ -7,6 +7,22 @@ class ValidationModel(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
+        self.enc = nn.Sequential(
+            nn.Conv2d(3, 16, 1),
+            nn.LeakyReLU(),
+            nn.Conv2d(16, 64, 2),
+            nn.LeakyReLU(),
+            nn.Conv2d(64, 256, 4),
+            nn.LeakyReLU(),
+            nn.ConvTranspose2d(256, 64, 4),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 16, 2),
+            nn.ReLU(),
+            nn.ConvTranspose2d(16, 3, 1),
+            nn.ReLU(),
+            nn.BatchNorm2d(3)
+        )
+
         # CNN
         self.conv1 = nn.Conv2d(3, 16, (4, 8))
         self.mp1 = nn.MaxPool2d((2, 1))
@@ -18,7 +34,6 @@ class ValidationModel(nn.Module):
         self.mp3 = nn.MaxPool2d(2)
         self.conv4 = nn.Conv2d(16, 32, 2)
 
-
         # Linear
         self.bn = nn.BatchNorm1d(96)
 
@@ -27,7 +42,7 @@ class ValidationModel(nn.Module):
 
         self.ln2 = nn.Linear(256, 512)
         self.do2 = nn.Dropout(0.5)
-        
+
         self.ln3 = nn.Linear(512, 256)
         self.do3 = nn.Dropout(0.5)
 
@@ -42,8 +57,9 @@ class ValidationModel(nn.Module):
 
         self.ln7 = nn.Linear(32, 1)
 
-
     def forward(self, img):
+        img = self.enc(img)
+
         # CNN
         img1 = torch.relu(self.conv1(img))
         img1 = self.mp1(img1)
@@ -84,5 +100,5 @@ class ValidationModel(nn.Module):
         img = self.do6(img)
 
         img = torch.sigmoid(self.ln7(img))
-        
+
         return img
